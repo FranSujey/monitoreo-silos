@@ -3,16 +3,16 @@ package com.example.monitoreo_silos.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.monitoreo_silos.data.repository.SiloRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class SiloViewModel(private val repository: SiloRepository) : ViewModel() {
 
-    // Conversión del Flow de Room a StateFlow de UI con manejo de estados
-    val uiState: StateFlow<SiloUiState> = repository.allSilos
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    // Conversión reactiva del Flow de Room a SiloUiState
+    val uiState: StateFlow<SiloUiState> = repository.obtenerTodosLosSilos()
         .map { listaSilos ->
             if (listaSilos.isEmpty()) {
                 SiloUiState.Empty
@@ -25,7 +25,22 @@ class SiloViewModel(private val repository: SiloRepository) : ViewModel() {
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000), // Detiene la recolección tras 5s de inactividad
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = SiloUiState.Loading
         )
+
+    init {
+        verificarYInicializarDatos()
+    }
+
+    private fun verificarYInicializarDatos() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val listaActual = repository.obtenerTodosLosSilos().firstOrNull() ?: emptyList()
+            if (listaActual.isEmpty()) {
+                repository.insertarSilosIniciales()
+            }
+            _isLoading.value = false
+        }
+    }
 }

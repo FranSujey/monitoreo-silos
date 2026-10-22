@@ -11,9 +11,6 @@ data class SiloEntity(
     val capacidadTotal: Double,       // Toneladas o kg
     val cantidadDisponible: Double,   // Cantidad actual
     val tipoAlimento: String,         // "Iniciador", "Engorda"
+    val porcentajeLlenado: Double,
     val estado: String                // "Normal", "Advertencia", "Crítico"
-) {
-    // Propiedad calculada helper para obtener el porcentaje en tiempo real
-    val porcentajeLlenado: Double
-        get() = if (capacidadTotal > 0) (cantidadDisponible / capacidadTotal) * 100.0 else 0.0
-}
+)

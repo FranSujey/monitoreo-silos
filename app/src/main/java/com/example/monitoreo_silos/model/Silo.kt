@@ -1,5 +1,9 @@
 package com.example.monitoreo_silos.model
-
+enum class EstadoSilo {
+    NORMAL,
+    ADVERTENCIA,
+    CRITICO
+}
 
 class Silo(
     val id: String,

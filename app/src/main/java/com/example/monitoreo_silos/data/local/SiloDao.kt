@@ -5,13 +5,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.monitoreo_silos.data.local.SiloEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SiloDao {
 
-    // Obtener todos los silos de manera reactiva (UI se actualiza automáticamente)
+    // Obtener todos los silos de manera reactiva
     @Query("SELECT * FROM silos ORDER BY id ASC")
     fun getAllSilos(): Flow<List<SiloEntity>>
 
@@ -23,13 +22,16 @@ interface SiloDao {
     @Query("SELECT * FROM silos WHERE id = :id")
     suspend fun getSiloById(id: Int): SiloEntity?
 
-    // Insertar un nuevo silo o reemplazar si ya existe
+    // Insertar un nuevo silo
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSilo(silo: SiloEntity)
 
-    // Insertar una lista completa de silos (carga inicial de pruebas)
+    // Métodos para inserción múltiple de silos
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(silos: List<SiloEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSilos(silos: List<SiloEntity>)
 
     // Actualizar un silo existente
     @Update

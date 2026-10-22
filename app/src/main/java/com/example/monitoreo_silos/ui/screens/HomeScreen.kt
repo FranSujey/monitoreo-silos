@@ -4,70 +4,70 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.monitoreo_silos.data.local.SiloEntity
 import com.example.monitoreo_silos.ui.components.SiloCard
 import com.example.monitoreo_silos.ui.viewmodel.SiloUiState
 import com.example.monitoreo_silos.ui.viewmodel.SiloViewModel
+import androidx.compose.runtime.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: SiloViewModel,
-    onSiloClick: (Int) -> Unit
+    onSiloClick: (SiloEntity) -> Unit
 ) {
-    // Observar el StateFlow desde Compose
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Monitoreo de Silos") }
+                title = { Text("Monitoreo de Silos", fontWeight = FontWeight.Bold) }
             )
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
+                .padding(innerPadding)
         ) {
-            // Estructura de control implícita para alternar respuesta visual
             when (val state = uiState) {
                 is SiloUiState.Loading -> {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "Cargando estado de silos...")
-                    }
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
-
                 is SiloUiState.Empty -> {
                     Text(
-                        text = "No hay registros de silos disponibles.",
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "No hay silos cargados en la base de datos.",
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
-
                 is SiloUiState.Error -> {
                     Text(
-                        text = "Error al cargar datos: ${state.message}",
+                        text = state.message,
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyLarge
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
-
                 is SiloUiState.Success -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(state.silos) { silo ->
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(
+                            items = state.silos,
+                            key = { it.id }
+                        ) { silo ->
                             SiloCard(
                                 silo = silo,
-                                onSiloClick = onSiloClick
+                                onSiloClick = { siloSeleccionado ->
+                                    onSiloClick(siloSeleccionado)
+                                }
                             )
                         }
                     }

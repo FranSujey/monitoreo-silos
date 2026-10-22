@@ -12,20 +12,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.monitoreo_silos.data.local.SiloEntity
 
 @Composable
 fun SiloCard(
     silo: SiloEntity,
-    onSiloClick: (Int) -> Unit
+    onSiloClick: (SiloEntity) -> Unit
 ) {
     var expandido by remember { mutableStateOf(false) }
 
-    // Determinar color según reglas de negocio del caso
+    // Color semántico según el nivel del caso
     val colorEstado = when {
         silo.porcentajeLlenado > 30.0 -> Color(0xFF2E7D32)      // Verde (Normal)
-        silo.porcentajeLlenado in 20.0..30.0 -> Color(0xFFF57C00) // Amarillo/Naranja (Advertencia)
+        silo.porcentajeLlenado in 20.0..30.0 -> Color(0xFFF57C00) // Naranja (Advertencia)
         else -> Color(0xFFC62828)                              // Rojo (Crítico)
     }
 
@@ -34,10 +36,11 @@ fun SiloCard(
             .fillMaxWidth()
             .padding(vertical = 6.dp)
             .clickable { expandido = !expandido },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Cabecera del Silo y Badge de Estado
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -45,53 +48,97 @@ fun SiloCard(
             ) {
                 Column {
                     Text(
-                        text = "Silo #${silo.id} - ${silo.tipoAlimento}",
-                        style = MaterialTheme.typography.titleMedium
+                        text = "SILO-${String.format("%03d", silo.id)}",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Granja ID: ${silo.granjaId}",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "Tipo: ${silo.tipoAlimento}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
                     )
                 }
 
-                // Insignia/Badge de Estado
+                // Insignia/Badge
                 Surface(
-                    color = colorEstado,
-                    shape = RoundedCornerShape(16.dp)
+                    color = colorEstado.copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = "${silo.porcentajeLlenado.toInt()}% (${silo.estado})",
-                        color = Color.White,
+                        color = colorEstado,
+                        fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                     )
                 }
             }
 
-            // Animación para mostrar/ocultar información extendida y alertas
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Indicador numérico de Nivel y Barra de Progreso
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Nivel: ${silo.cantidadDisponible.toInt()} / ${silo.capacidadTotal.toInt()} kg",
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "${silo.porcentajeLlenado.toInt()}%",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            LinearProgressIndicator(
+                progress = { (silo.porcentajeLlenado / 100.0).toFloat().coerceIn(0f, 1f) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp),
+                color = colorEstado,
+                trackColor = Color.LightGray.copy(alpha = 0.4f)
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Botón de acción para abrir el Formulario
+            Button(
+                onClick = { onSiloClick(silo) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Registrar Movimiento / Incidencia")
+            }
+
+            // Animaciones de detalles desplegables
             AnimatedVisibility(
                 visible = expandido,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
                 Column(modifier = Modifier.padding(top = 12.dp)) {
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Capacidad Total: ${silo.capacidadTotal} Toneladas")
-                    Text(text = "Cantidad Disponible: ${silo.cantidadDisponible} Toneladas")
+                    Text(text = "Granja ID: ${silo.granjaId}")
+                    Text(text = "Capacidad Total: ${silo.capacidadTotal} kg")
+                    Text(text = "Cantidad Disponible: ${silo.cantidadDisponible} kg")
 
                     if (silo.porcentajeLlenado < 20.0) {
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color(0xFFFFEBEE), shape = RoundedCornerShape(6.dp))
-                                .padding(8.dp)
+                                .background(Color(0xFFFFEBEE), shape = RoundedCornerShape(8.dp))
+                                .padding(10.dp)
                         ) {
                             Text(
                                 text = "⚠️ ALERTA: Nivel crítico. Requiere reposición urgente.",
                                 color = Color(0xFFC62828),
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
@@ -100,4 +147,3 @@ fun SiloCard(
         }
     }
 }
-
