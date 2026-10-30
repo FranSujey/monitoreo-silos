@@ -2,6 +2,7 @@ package com.example.monitoreo_silos.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.monitoreo_silos.data.local.SiloEntity
 import com.example.monitoreo_silos.data.repository.SiloRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -41,6 +42,13 @@ class SiloViewModel(private val repository: SiloRepository) : ViewModel() {
                 repository.insertarSilosIniciales()
             }
             _isLoading.value = false
+        }
+    }
+
+    // NUEVO MÉTODO: Permite insertar un nuevo silo desde la interfaz o el panel de admin
+    fun insertarSilo(silo: SiloEntity) {
+        viewModelScope.launch {
+            repository.insertarSilo(silo)
         }
     }
 }

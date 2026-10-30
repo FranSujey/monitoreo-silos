@@ -94,4 +94,6 @@ class SiloRepository(private val siloDao: SiloDao) {
         )
         siloDao.insertSilos(silosIniciales)
     }
+
+    fun insertarSilo(siloEntity: SiloEntity) {}
 }
