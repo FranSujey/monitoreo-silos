@@ -3,6 +3,7 @@ package com.example.monitoreo_silos.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,11 +11,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.monitoreo_silos.ui.AuthViewModel
 import com.example.monitoreo_silos.ui.screens.AdminDashboardScreen
+import com.example.monitoreo_silos.ui.screens.CameraGaleriaScreen
 import com.example.monitoreo_silos.ui.screens.FormMovimientoScreen
 import com.example.monitoreo_silos.ui.screens.HomeScreen
 import com.example.monitoreo_silos.ui.screens.LoginScreen
 import com.example.monitoreo_silos.ui.screens.RegisterScreen
 import com.example.monitoreo_silos.ui.screens.SiloDetailScreen
+import com.example.monitoreo_silos.ui.viewmodel.CameraGaleriaViewModel
 import com.example.monitoreo_silos.ui.viewmodel.FormMovimientoViewModel
 import com.example.monitoreo_silos.ui.viewmodel.SiloUiState
 import com.example.monitoreo_silos.ui.viewmodel.SiloViewModel
@@ -30,6 +33,7 @@ sealed class Screen(val route: String) {
     object FormMovimiento : Screen("form_movimiento/{siloId}") {
         fun createRoute(siloId: Int) = "form_movimiento/$siloId"
     }
+    object CameraGaleria : Screen("camera_galeria")
 }
 
 @Composable
@@ -127,6 +131,9 @@ fun AppNavigation(
                     onBackClick = { navController.popBackStack() },
                     onRegistrarMovimiento = {
                         navController.navigate(Screen.FormMovimiento.createRoute(siloEncontrado.id))
+                    },
+                    onAbrirCamara = {
+                        navController.navigate(Screen.CameraGaleria.route)
                     }
                 )
             }
@@ -149,6 +156,15 @@ fun AppNavigation(
                     }
                 )
             }
+        }
+
+        // 7. CÁMARA Y GALERÍA (EVIDENCIA FOTOGRÁFICA)
+        composable(Screen.CameraGaleria.route) {
+            val cameraViewModel: CameraGaleriaViewModel = viewModel()
+            CameraGaleriaScreen(
+                viewModel = cameraViewModel,
+                onBackClick = { navController.popBackStack() }
+            )
         }
     }
 }

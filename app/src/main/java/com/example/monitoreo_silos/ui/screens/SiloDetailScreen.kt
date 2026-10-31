@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
@@ -25,7 +26,8 @@ import com.example.monitoreo_silos.data.local.SiloEntity
 fun SiloDetailScreen(
     silo: SiloEntity,
     onBackClick: () -> Unit,
-    onRegistrarMovimiento: () -> Unit
+    onRegistrarMovimiento: () -> Unit,
+    onAbrirCamara: () -> Unit
 ) {
     val colorEstado = when {
         silo.porcentajeLlenado < 20.0 -> Color(0xFFC62828)
@@ -132,16 +134,32 @@ fun SiloDetailScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Botón de Acción Directa
-            Button(
-                onClick = onRegistrarMovimiento,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
+            // Botones de Acción
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(Icons.Default.Edit, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Registrar Carga o Descarga")
+                Button(
+                    onClick = onRegistrarMovimiento,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Registrar Carga o Descarga")
+                }
+
+                OutlinedButton(
+                    onClick = onAbrirCamara,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Icon(Icons.Default.CameraAlt, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Adjuntar Evidencia Fotográfica")
+                }
             }
         }
     }
