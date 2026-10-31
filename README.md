@@ -37,3 +37,7 @@ Aplicación móvil desarrollada para operarios, supervisores y jefaturas de empr
 1. Clonar el repositorio:
    ```bash
    git clone [https://github.com/TU_USUARIO/dsy1105-monitoreo-silos.git](https://github.com/TU_USUARIO/dsy1105-monitoreo-silos.git)
+
+## Trello
+   ```bash
+https://trello.com/invite/b/6ae53a109d016c1436c518d4/ATTI1537ad52ea9c45cffe77c8800cccd4488C090F5F/silos
