@@ -67,6 +67,7 @@ dependencies {
 
     // 5. Carga de Imágenes Nativas
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 
     // Testing y Debug
     testImplementation(libs.junit)
@@ -76,4 +77,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+
 }
