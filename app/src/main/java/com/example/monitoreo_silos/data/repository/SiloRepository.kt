@@ -22,8 +22,10 @@ class SiloRepository(private val siloDao: SiloDao) {
     // Registrar Carga de Alimento (Suma stock y recalculación de porcentaje y estado)
     suspend fun registrarCarga(siloId: Int, cantidadIngresada: Double): Boolean {
         val silo = siloDao.getSiloById(siloId) ?: return false
-        val nuevaCantidad = (silo.cantidadDisponible + cantidadIngresada).coerceAtMost(silo.capacidadTotal)
-        val nuevoPorcentaje = if (silo.capacidadTotal > 0) (nuevaCantidad / silo.capacidadTotal) * 100.0 else 0.0
+        val nuevaCantidad =
+            (silo.cantidadDisponible + cantidadIngresada).coerceAtMost(silo.capacidadTotal)
+        val nuevoPorcentaje =
+            if (silo.capacidadTotal > 0) (nuevaCantidad / silo.capacidadTotal) * 100.0 else 0.0
         val nuevoEstado = calcularEstado(nuevaCantidad, silo.capacidadTotal)
 
         val siloActualizado = silo.copy(
@@ -39,7 +41,8 @@ class SiloRepository(private val siloDao: SiloDao) {
     suspend fun registrarDescarga(siloId: Int, cantidadRetirada: Double): Boolean {
         val silo = siloDao.getSiloById(siloId) ?: return false
         val nuevaCantidad = (silo.cantidadDisponible - cantidadRetirada).coerceAtLeast(0.0)
-        val nuevoPorcentaje = if (silo.capacidadTotal > 0) (nuevaCantidad / silo.capacidadTotal) * 100.0 else 0.0
+        val nuevoPorcentaje =
+            if (silo.capacidadTotal > 0) (nuevaCantidad / silo.capacidadTotal) * 100.0 else 0.0
         val nuevoEstado = calcularEstado(nuevaCantidad, silo.capacidadTotal)
 
         val siloActualizado = silo.copy(
@@ -57,7 +60,7 @@ class SiloRepository(private val siloDao: SiloDao) {
         val porcentaje = (cantidad / capacidadTotal) * 100.0
         return when {
             porcentaje > 30.0 -> "Normal"
-            porcentaje in 20.0..30.0 -> "Advertencia"
+            porcentaje in 15.0..30.0 -> "Advertencia"
             else -> "Crítico"
         }
     }
@@ -95,5 +98,7 @@ class SiloRepository(private val siloDao: SiloDao) {
         siloDao.insertSilos(silosIniciales)
     }
 
-    fun insertarSilo(siloEntity: SiloEntity) {}
+    suspend fun insertarSilo(siloEntity: SiloEntity) {
+        siloDao.insertSilo(siloEntity)
+    }
 }

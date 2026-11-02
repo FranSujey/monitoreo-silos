@@ -28,9 +28,6 @@ interface SiloDao {
 
     // Métodos para inserción múltiple de silos
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(silos: List<SiloEntity>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSilos(silos: List<SiloEntity>)
 
     // Actualizar un silo existente

@@ -73,19 +73,45 @@ class FormMovimientoViewModel(
         onCantidadChanged(_formState.value.cantidadText, silo)
     }
 
-    // Guardar el registro en la base de datos local
+    // GUARDAR REGISTRO DE CARGAS Y DESCARGAS EN BASE LOCAL
     fun guardarMovimiento(siloId: Int) {
         viewModelScope.launch {
-            val cantidad = _formState.value.cantidadText.toDoubleOrNull() ?: return@launch
-            val exito = if (_formState.value.tipoMovimiento == "Carga") {
-                repository.registrarCarga(siloId, cantidad)
-            } else {
-                repository.registrarDescarga(siloId, cantidad)
+            val estadoActual = _formState.value
+            val cantidad = estadoActual.cantidadText.toDoubleOrNull()
+                ?: return@launch
+
+            if (cantidad <= 0.0 || estadoActual.cantidadError != null) {
+                return@launch
             }
 
-            if (exito) {
-                _formState.update { it.copy(isSuccess = true) }
+            try {
+                val exito = if (estadoActual.tipoMovimiento == "Carga") {
+                    repository.registrarCarga(siloId, cantidad)
+                } else {
+                    repository.registrarDescarga(siloId, cantidad)
+                }
+
+                if (exito) {
+                    _formState.update {
+                        it.copy(isSuccess = true)
+                    }
+                }
+            } catch (e: Exception) {
+                _formState.update {
+                    it.copy(
+                        cantidadError = "No se pudo guardar el movimiento: ${e.localizedMessage}",
+                        isFormValid = false
+                    )
+                }
             }
         }
     }
+
+    // INICIALIZACIÓN Y REINICIO DEL FORMULARIO
+    fun iniciarFormulario(siloId: Int) {
+        _formState.value = FormMovimientoUiState(
+            siloId = siloId
+        )
+    }
+
 }

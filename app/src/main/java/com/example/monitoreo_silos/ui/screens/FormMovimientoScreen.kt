@@ -186,6 +186,11 @@ fun FormMovimientoScreen(
                 }
             )
 
+            // REINICIAR FORMULARIO AL ABRIR UN SILO
+            LaunchedEffect(silo.id) {
+                viewModel.iniciarFormulario(silo.id)
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             // Botón de Envío con Animación de Retroalimentación Visual

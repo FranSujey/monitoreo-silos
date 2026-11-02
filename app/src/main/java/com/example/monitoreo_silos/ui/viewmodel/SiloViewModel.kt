@@ -34,14 +34,26 @@ class SiloViewModel(private val repository: SiloRepository) : ViewModel() {
         verificarYInicializarDatos()
     }
 
+    // VERIFICAR E INICIALIZAR DATOS EN LA BASE LOCAL
     private fun verificarYInicializarDatos() {
         viewModelScope.launch {
             _isLoading.value = true
-            val listaActual = repository.obtenerTodosLosSilos().firstOrNull() ?: emptyList()
-            if (listaActual.isEmpty()) {
-                repository.insertarSilosIniciales()
+
+            try {
+                val listaActual = repository
+                    .obtenerTodosLosSilos()
+                    .firstOrNull() ?: emptyList()
+
+                if (listaActual.isEmpty()) {
+                    repository.insertarSilosIniciales()
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+            } finally {
+                _isLoading.value = false
             }
-            _isLoading.value = false
         }
     }
 

@@ -8,9 +8,9 @@ data class SiloEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val granjaId: Int,
-    val capacidadTotal: Double,       // Toneladas o kg
-    val cantidadDisponible: Double,   // Cantidad actual
-    val tipoAlimento: String,         // "Iniciador", "Engorda"
+    val capacidadTotal: Double,
+    val cantidadDisponible: Double,
+    val tipoAlimento: String,
     val porcentajeLlenado: Double,
-    val estado: String                // "Normal", "Advertencia", "Crítico"
+    val estado: String
 )
